@@ -1,0 +1,17 @@
+{% from "bootstrap5/form.html" import render_form %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% if is_login %}
+        <title>Login</title>
+    {% else %}
+        <title>Register</title>
+    {% endif %}
+</head>
+<body>
+<div>
+    {{ render_form(form) }}
+</div>
+</body>
+</html>
