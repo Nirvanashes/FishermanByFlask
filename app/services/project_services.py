@@ -7,6 +7,10 @@ from app.schema import Project
 
 class ProjectServices:
     @staticmethod
+    def get_all_projects():
+        return db.session.scalars(select(Project)).all()
+
+    @staticmethod
     def get_all_level1_projects():
         return db.session.scalars(select(Project).where(Project.parent_project_id is None)).all()
 
@@ -18,11 +22,7 @@ class ProjectServices:
         return projects.reverse()
 
     @staticmethod
-    def get_all_projects():
-        return db.session.scalars(select(Project)).all()
-
-    @staticmethod
-    def add_project(name,user):
+    def add_project(name, user):
         new_project = Project(
             name=name,
             create_user=user

@@ -10,10 +10,10 @@ pj_bp = Blueprint("project", __name__)
 @pj_bp.route("/projects")
 def get_all_projects():
     projects = ProjectServices.get_all_projects()
-    return projects
+    return render_template("project.html",projects=projects)
 
 
-@pj_bp.route("/add-project",methods=["GET","POST"])
+@pj_bp.route("/add-project", methods=["GET", "POST"])
 # @login_required
 def add_project():
     form = SetProjectForm()
@@ -23,5 +23,5 @@ def add_project():
                 name=form.name.data,
                 user=current_user
             )
-            return redirect(url_for("project.add_project"))
-    return render_template("project.html", form=form)
+            return redirect(url_for("project.get_all_projects"))
+    return render_template("add-project.html", form=form)

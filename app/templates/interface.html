@@ -13,16 +13,20 @@
       <div class="d-flex justify-content-end mb-4">
         <a
           class="btn btn-primary float-right"
-          href="{{url_for('project.add_project')}}"
-          >Create New Project</a
+          href="{{url_for('interface.add_interface')}}"
+          >Create New Interface</a
         >
       </div>
       {% endif %}
 </div>
     <div>
-    {% for project in projects %}
-    	<h2>{{ project.name }}</h2>
-    {% endfor %}
+        {% for item in interface %}
+            <div>
+            <h1>{{ item.interface_name }}</h1>
+            <h2>{{ item.interface_address }}</h2>
+            </div>
+        {% endfor %}
+
 
     </div>
 </body>
