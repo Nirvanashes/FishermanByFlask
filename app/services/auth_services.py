@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.auth.models import User
+from app.schema import User
 from app.utils.security import generate_password, check_password
 
 
