@@ -7,38 +7,39 @@
 </head>
 <body>
 <div>
-    <div>
-        <h1>接口名称：{{ interface.interface_name }}</h1>
-        <p>接口地址：{{ interface.interface_address }}</p>
-        <p>接口请求方式：{{ interface.interface_method }}</p>
-        <p>接口描述：{{ interface.description }}</p>
-        <p>接口所属项目：{{ interface.belong_project.name }}</p>
-    </div>
-    <div>
-        <div class="d-flex justify-content-end mb-4">
-            <a
-                    class="btn btn-primary float-right"
-                    href="{{ url_for('case.add_case',interface_id=interface.id) }}"
-            >Add Case</a
-            >
+        <div>
+            <h1>接口名称：{{ interface.interface_name }}</h1>
+            <p>接口地址：{{ interface.interface_address }}</p>
+            <p>接口请求方式：{{ interface.interface_method }}</p>
+            <p>接口描述：{{ interface.description }}</p>
+            <p>接口所属项目：{{ interface.belong_project.name }}</p>
+{#            <div class="d-flex justify-content-end mb-4">#}
+                <a
+                        class="btn btn-primary float-right"
+                        href="{{ url_for('case.add_case',interface_id=interface.id) }}"
+                >Add Case</a
+                >
+{#            </div>#}
         </div>
+    <div>
+    <hr class="my-4"/>
         {% for case in interface.testcases %}
             <div>
                 <h3>{{ case.testcase_name }}</h3>
-                <div class="d-flex justify-content-end mb-4">
+{#                <div class="d-flex justify-content-end mb-4">#}
                     <a
-                            class="btn btn-primary float-right"
+                            class="btn btn-primary float-right justify-content-end mb-4"
                             href="{{ url_for('case.edit_case', case_id=case.id) }}"
                     >Edit Case</a
                     >
                     <a
-                            class="btn btn-primary float-right"
+                            class="btn btn-primary float-right justify-content-end mb-4"
                             href="{{ url_for('case.del_case', case_id=case.id,interface_id=interface.id) }}"
                     >Delete Case</a
                     >
-                </div>
+{#                </div>#}
             </div>
-
+            <hr class="my-4"/>
         {% endfor %}
 
     </div>
