@@ -25,6 +25,12 @@ def filter_by_project(project_id):
     return all_interface
 
 
+@interface_bp.route("/interface-info/<int:interface_id>")
+def show_interface(interface_id):
+    interface_info = InterfaceServices.get_interface_by_id(interface_id)
+    return render_template("interface-info.html", interface=interface_info)
+
+
 @interface_bp.route("/add-interface", methods=["GET", "POST"])
 def add_interface():
     form = InterfaceForm()
@@ -33,7 +39,7 @@ def add_interface():
     # form = InterfaceServices.make_interface_form()
     if form.validate_on_submit():
         new_interface = InterfaceServices.add_interface(form)
-        return render_template("interface.html")
+        return redirect(url_for("interface.get_all_interface"))
     return render_template("make-interface.html", form=form)
 
 
@@ -44,7 +50,7 @@ def edit_interface(interface_id):
         interface_name=interface.interface_name,
         interface_method=interface.interface_method,
         interface_address=interface.interface_address,
-        headers=interface.headers,
+        description=interface.description,
         belong_project=interface.belong_project_id
     )
     projects_list = ProjectServices.get_all_projects()

@@ -8,7 +8,6 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Integer
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
 from flask_mail import Mail
-
 from flask_caching import Cache
 
 

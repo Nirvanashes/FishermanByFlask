@@ -30,9 +30,10 @@ class InterfaceServices:
             interface_name=form.interface_name.data,
             interface_address=form.interface_address.data,
             interface_method=form.interface_method.data,
-            headers=form.headers.data,
+            # headers=form.headers.data,
             belong_project_id=form.belong_project.data,
-            create_user_id=current_user.id
+            create_user_id=current_user.id,
+            description=form.description.data
         )
         db.session.add(new_interface)
         db.session.commit()
@@ -46,6 +47,7 @@ class InterfaceServices:
         interface.interface_name = form.interface_name.data
         interface.belong_project_id = form.belong_project.data
         interface.create_user_id = current_user.id
+        interface.description = form.description.data
         db.session.commit()
         return interface
 

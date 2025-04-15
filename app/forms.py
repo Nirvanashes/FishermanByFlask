@@ -33,8 +33,9 @@ class InterfaceForm(FlaskForm):
     interface_method = SelectField(label="Interface Method",
                                  choices=["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
                                  validators=[DataRequired()])
+    description = StringField(label="Description")
     # params_type = SelectField("Params Type", choices=["FORM", "JSON"])
-    headers = StringField(label="Interface Headers")
+    # headers = StringField(label="Interface Headers")
     submit = SubmitField(label="Submit")
 
 
@@ -44,4 +45,7 @@ class InterfaceTestcaseFrom(FlaskForm):
     headers = StringField(label="Headers")
     params = StringField(label="Request Params")
     expected_results = StringField(label="Expected results", validators=[DataRequired()])
+    description = StringField(label="Description")
+    submit = SubmitField(label="Submit")
+
 

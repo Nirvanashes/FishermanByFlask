@@ -22,11 +22,14 @@
 <div>
     {% for item in interface %}
         <div>
-            <h1>{{ item.interface_name }}</h1>
-            <h2>{{ item.interface_address }}</h2>
+            <h1>接口名称：{{ item.interface_name }}</h1>
+            <h2>接口地址：{{ item.interface_address }}</h2>
+            <a class="btn btn-primary float-right" href="{{ url_for("interface.show_interface",interface_id=item.id) }}">Info</a>
+
         <a class="btn btn-primary float-right" href="{{ url_for("interface.edit_interface",interface_id=item.id) }}">Edit</a>
         </div>
     {% endfor %}
 </div>
 </body>
 </html>
+{% include "footer.html" %}

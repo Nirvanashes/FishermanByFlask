@@ -11,14 +11,16 @@ class UserInfo(db.Model):
     # update_user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
 
 
+# class User(UserMixin,db.Model):
 class User(UserMixin, db.Model):
     # id: Mapped[int] = mapped_column(Integer, primary_key=True) #迁移至Base类中统一生成
     email: Mapped[str] = mapped_column(String(100), unique=True)
     password: Mapped[str] = mapped_column(String(100))
     name: Mapped[str] = mapped_column(String(100))
-    default_project:Mapped[int] = mapped_column(Integer,nullable=True)
+    default_project: Mapped[int] = mapped_column(Integer, nullable=True)
 
-    created_projects: Mapped[List["Project"]] = relationship(back_populates="create_user"
+    created_projects: Mapped[List["Project"]] = relationship(back_populates="create_user",
+                                                             foreign_keys="[Project.create_user_id]"
                                                              )
 
 
@@ -37,7 +39,8 @@ class Interface(UserInfo):
     interface_name: Mapped[str] = mapped_column(String)
     interface_address: Mapped[str] = mapped_column(String, unique=True)
     interface_method: Mapped[str] = mapped_column(String(10))
-    headers: Mapped[str] = mapped_column(String)
+    # headers: Mapped[str] = mapped_column(String)
+    description: Mapped[str] = mapped_column(Text)
 
     belong_project_id: Mapped[int] = mapped_column(ForeignKey("project.id"))
     belong_project: Mapped["Project"] = relationship(back_populates="interfaces")
@@ -46,10 +49,11 @@ class Interface(UserInfo):
 
 class TestCase(UserInfo):
     testcase_name: Mapped[str] = mapped_column(String)
-    params: Mapped[str] = mapped_column(String)
-    params_type: Mapped[str] = mapped_column(String, nullable=True)
-    expected_results: Mapped[str] = mapped_column(String)
     headers: Mapped[str] = mapped_column(String)
+    params: Mapped[str] = mapped_column(String)
+    # params_type: Mapped[str] = mapped_column(String, nullable=True)
+    expected_results: Mapped[str] = mapped_column(String)
+    description: Mapped[str] = mapped_column(Text)
 
     belong_interface_id: Mapped[int] = mapped_column(ForeignKey("interface.id"))
     belong_interface: Mapped["Interface"] = relationship(back_populates="testcases")
@@ -61,4 +65,3 @@ class TestResult(UserInfo):
 
 class TestResultInfo(UserInfo):
     pass
-
