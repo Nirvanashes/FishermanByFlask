@@ -22,7 +22,7 @@ def register():
         )
         login_user(new_user)
         return render_template("index.html")
-    return render_template("login.html", form=form, is_login=True)
+    return render_template("login.html", form=form, is_login=False)
 
 
 @auth_bp.route(rule="/login", methods=["GET", "POST"])

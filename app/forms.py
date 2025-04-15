@@ -30,11 +30,11 @@ class InterfaceForm(FlaskForm):
     belong_project = SelectField(label="Belong Project", coerce=int)  # 需要实例化后传递给表单
     interface_name = StringField(label="Interface Name", validators=[DataRequired()])
     interface_address = URLField(label="Interface Address", validators=[DataRequired()])
-    interface_method = SelectField(label="Request Method",
+    interface_method = SelectField(label="Interface Method",
                                  choices=["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
                                  validators=[DataRequired()])
     # params_type = SelectField("Params Type", choices=["FORM", "JSON"])
-    headers = StringField(label="Headers")
+    headers = StringField(label="Interface Headers")
     submit = SubmitField(label="Submit")
 
 

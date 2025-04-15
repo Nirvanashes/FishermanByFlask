@@ -1,18 +1,17 @@
-{% include "header.html" %}
+{% extends "base.html" %}
 {% from "bootstrap5/form.html" import render_form %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+
+{% block title %}
     {% if is_login %}
-        <title>Login</title>
+        Login
     {% else %}
-        <title>Register</title>
+        Register
     {% endif %}
-</head>
-<body>
-<div>
-    {{ render_form(form) }}
-</div>
-</body>
-</html>
+{% endblock %}
+
+{% block content %}
+	<div>
+        {{ render_form(form) }}
+    </div>
+{% endblock %}
+

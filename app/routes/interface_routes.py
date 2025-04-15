@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, render_template, url_for
+from flask import Flask, Blueprint, render_template, url_for, redirect
 
 from app.forms import InterfaceForm
 from app.services.interface_services import InterfaceServices
@@ -29,8 +29,27 @@ def filter_by_project(project_id):
 def add_interface():
     form = InterfaceForm()
     projects_list = ProjectServices.get_all_projects()
-    form.belong_project.choices = [(project.id,project.name) for project in projects_list]
+    form.belong_project.choices = [(project.id, project.name) for project in projects_list]
+    # form = InterfaceServices.make_interface_form()
     if form.validate_on_submit():
         new_interface = InterfaceServices.add_interface(form)
         return render_template("interface.html")
-    return render_template("add-interface.html", form=form)
+    return render_template("make-interface.html", form=form)
+
+
+@interface_bp.route("/edit-interface/<int:interface_id>", methods=["GET", "POST"])
+def edit_interface(interface_id):
+    interface = InterfaceServices.get_interface_by_id(interface_id)
+    form = InterfaceForm(
+        interface_name=interface.interface_name,
+        interface_method=interface.interface_method,
+        interface_address=interface.interface_address,
+        headers=interface.headers,
+        belong_project=interface.belong_project_id
+    )
+    projects_list = ProjectServices.get_all_projects()
+    form.belong_project.choices = [(project.id, project.name) for project in projects_list]
+    if form.validate_on_submit():
+        interface = InterfaceServices.edit_interface(interface_id, form)
+        return redirect(url_for("interface.get_all_interface"))
+    return render_template("make-interface.html", form=form)

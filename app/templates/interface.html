@@ -10,24 +10,23 @@
 <body>
 <div>
     {% if current_user.is_authenticated %}
-      <div class="d-flex justify-content-end mb-4">
-        <a
-          class="btn btn-primary float-right"
-          href="{{url_for('interface.add_interface')}}"
-          >Create New Interface</a
-        >
-      </div>
-      {% endif %}
+        <div class="d-flex justify-content-end mb-4">
+            <a
+                    class="btn btn-primary float-right"
+                    href="{{ url_for('interface.add_interface') }}"
+            >Create New Interface</a
+            >
+        </div>
+    {% endif %}
 </div>
-    <div>
-        {% for item in interface %}
-            <div>
+<div>
+    {% for item in interface %}
+        <div>
             <h1>{{ item.interface_name }}</h1>
             <h2>{{ item.interface_address }}</h2>
-            </div>
-        {% endfor %}
-
-
-    </div>
+        <a class="btn btn-primary float-right" href="{{ url_for("interface.edit_interface",interface_id=item.id) }}">Edit</a>
+        </div>
+    {% endfor %}
+</div>
 </body>
 </html>
