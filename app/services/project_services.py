@@ -5,9 +5,6 @@ from app.extensions import db
 from app.schema import Project
 
 
-
-
-
 class ProjectServices:
     @staticmethod
     def get_all_projects():
@@ -45,3 +42,11 @@ class ProjectServices:
         project.create_user = current_user
         project.create_user_id = current_user.id
         db.session.commit()
+        return True
+
+    @staticmethod
+    def del_project(project_id):
+        project = ProjectServices.get_project_by_id(project_id)
+        db.session.delete(project)
+        db.session.commit()
+        return True

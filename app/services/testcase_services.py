@@ -47,3 +47,9 @@ class TestCaseServices:
         case.create_user_id = current_user.id
         db.session.commit()
         return case
+
+    @staticmethod
+    def del_case(case_id):
+        case = TestCaseServices.get_case_by_id(case_id)
+        db.session.delete(case)
+        db.session.commit()

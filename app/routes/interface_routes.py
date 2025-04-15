@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, render_template, url_for, redirect
+from flask import Flask, Blueprint, render_template, url_for, redirect, request
 
 from app.forms import InterfaceForm
 from app.services.interface_services import InterfaceServices
@@ -59,3 +59,10 @@ def edit_interface(interface_id):
         interface = InterfaceServices.edit_interface(interface_id, form)
         return redirect(url_for("interface.get_all_interface"))
     return render_template("make-interface.html", form=form)
+
+
+@interface_bp.route("/del-interface")
+def del_interface():
+    interface_id = request.args.get("interface_id")
+    InterfaceServices.del_interface(interface_id)
+    return redirect(url_for("interface.get_all_interface"))

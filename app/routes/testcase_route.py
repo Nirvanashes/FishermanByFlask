@@ -51,4 +51,9 @@ def edit_case(case_id):
         return redirect(url_for("interface.show_interface", interface_id=form.belong_interface.data))
     return render_template("make-case.html", form=form)
 
-
+@case_route.route("/del-case")
+def del_case():
+    case_id = request.args.get("case_id")
+    interface_id = request.args.get("interface_id")
+    TestCaseServices.del_case(case_id)
+    return redirect(url_for("interface.show_interface", interface_id=interface_id))

@@ -57,3 +57,11 @@ class InterfaceServices:
         projects_list = ProjectServices.get_all_projects()
         form.belong_project.choices = [(project.id, project.name) for project in projects_list]
         return form
+
+    @staticmethod
+    def del_interface(interface_id):
+        interface = InterfaceServices.get_interface_by_id(interface_id)
+        db.session.delete(interface)
+        db.session.commit()
+        return True
+

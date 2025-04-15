@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, url_for, render_template
+from flask import Blueprint, redirect, url_for, render_template, request
 from flask_login import login_required, current_user
 
 from app.forms import SetProjectForm
@@ -39,4 +39,12 @@ def edit_project(project_id):
             project=project
         )
         return redirect(url_for("project.get_all_projects"))
-    return render_template("make-project.html",form=form)
+    return render_template("make-project.html", form=form)
+
+
+@pj_bp.route("/del-project")
+@login_required
+def del_project():
+    project_id = request.args.get("project_id")
+    ProjectServices.del_project(project_id)
+    return redirect(url_for("project.get_all_projects"))

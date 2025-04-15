@@ -25,6 +25,8 @@
             <h3 class="d-flex mb-4">项目名称：{{ project.name }}
                 <a class="btn btn-primary float-right"
                    href="{{ url_for("project.edit_project",project_id=project.id) }}">Edit</a>
+                <a class="btn btn-primary float-right"
+                   href="{{ url_for("project.del_project",project_id=project.id) }}">Delete</a>
             </h3>
 
         </div>
