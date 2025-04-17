@@ -118,7 +118,10 @@ class TestCaseServices:
             request_address = interface.interface_address
             request_method = interface.interface_method
             # todo 处理headers为空的情况
-            request_headers = json.loads(wait_executed_testcase.headers)
+            if wait_executed_testcase.headers:
+                request_headers = json.loads(wait_executed_testcase.headers)
+            else:
+                request_headers = ""
             request_params = wait_executed_testcase.params
             response = requests.request(method=request_method,
                                         url=request_address,
