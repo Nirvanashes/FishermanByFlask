@@ -25,4 +25,4 @@ def welcome():
 
 
 if __name__ == "__main__":
-    app.run(debug=Config.DEBUG, port=Config.PORT)
+    app.run(debug=Config.APP_DEBUG, port=Config.PORT)
