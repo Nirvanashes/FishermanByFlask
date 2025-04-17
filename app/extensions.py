@@ -41,5 +41,7 @@ def init_extensions(app):
     db.init_app(app)
     bootstrap.init_app(app)
     login_manager.init_app(app)
+    login_manager.login_view = "auth.login"
+    login_manager.login_message_category = "warning"
     mail.init_app(app)
     cache.init_app(app)
