@@ -1,7 +1,7 @@
 from typing import List
 from flask_login import UserMixin
 from sqlalchemy.orm import relationship, Mapped, mapped_column
-from sqlalchemy import Integer, String, Text, ForeignKey
+from sqlalchemy import Integer, String, Text, ForeignKey,JSON
 from app.extensions import db
 
 
@@ -49,8 +49,9 @@ class Interface(UserInfo):
 
 class TestCase(UserInfo):
     testcase_name: Mapped[str] = mapped_column(String)
-    headers: Mapped[str] = mapped_column(String)
-    params: Mapped[str] = mapped_column(String)
+    headers: Mapped[dict] = mapped_column(JSON)
+    # params: Mapped[str] = mapped_column(String)
+    params: Mapped[dict] = mapped_column(JSON)
     # params_type: Mapped[str] = mapped_column(String, nullable=True)
     expected_results: Mapped[str] = mapped_column(String)
     description: Mapped[str] = mapped_column(Text)
@@ -78,10 +79,10 @@ class TestResultItem(UserInfo):
 
     testcase_id:Mapped[int] = mapped_column(ForeignKey("test_case.id"))
     testcase_name: Mapped[str] = mapped_column(String)
-    headers: Mapped[str] = mapped_column(String)
-    params: Mapped[str] = mapped_column(String)
+    headers: Mapped[dict] = mapped_column(JSON)
+    params: Mapped[dict] = mapped_column(JSON)
     expected_results: Mapped[str] = mapped_column(String)
-    actual_results: Mapped[str] = mapped_column(String)
+    actual_results: Mapped[dict] = mapped_column(JSON)
     execution_status: Mapped[str] = mapped_column(String)
 
     result_id: Mapped[int] = mapped_column(ForeignKey("test_result.id"))

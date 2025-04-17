@@ -1,4 +1,5 @@
 import datetime
+import json
 from flask_login import current_user
 from sqlalchemy import select, func
 from app.extensions import db
@@ -67,8 +68,8 @@ class TestCaseServices:
 
         # 4.更新结果表数据
         result = db.get_or_404(TestResult, result_id)
-        result.status_of_executions = executed_result.get("status_of_executions")
-        result.success_of_executions = executed_result.get("success_num", 0)
+        result.status_of_executions = executed_result.get("status_of_executions","err")
+        result.success_of_executions = executed_result.get("success_num",0)
         result.fail_of_executions = executed_result.get("fail_num", 0)
         db.session.commit()
 
@@ -107,7 +108,7 @@ class TestCaseServices:
         return new_result.id
 
     @staticmethod
-    async def execute_case(result_id, wait_executed_testcase_list: list[TestCase]):
+    def execute_case(result_id, wait_executed_testcase_list: list[TestCase]):
         # 将执行成功、失败用例合成一个二元列表返回：
         success_list = fail_list = [TestResultItem]
         success_num = fail_num = 0
@@ -116,15 +117,16 @@ class TestCaseServices:
             interface = wait_executed_testcase.belong_interface
             request_address = interface.interface_address
             request_method = interface.interface_method
-            request_headers = wait_executed_testcase.headers
+            # todo 处理headers为空的情况
+            request_headers = json.loads(wait_executed_testcase.headers)
             request_params = wait_executed_testcase.params
             response = requests.request(method=request_method,
                                         url=request_address,
                                         headers=request_headers,
-                                        data=request_params,
-                                        params=request_params
+                                        data=request_params
+                                        # params=request_params
                                         )
-            actual_results = response.text
+            actual_results = json.dumps(response.json())
             new_result_item = TestResultItem(
                 interface_id=interface.id,
                 interface_name=interface.interface_name,
@@ -160,7 +162,7 @@ class TestCaseServices:
         }
         return result
 
-# -------------------------------------------------执行结果列表相关------------------------------------------------- #
+    # -------------------------------------------------执行结果列表相关------------------------------------------------- #
 
     @staticmethod
     def get_result_list():
