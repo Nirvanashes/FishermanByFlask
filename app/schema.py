@@ -60,8 +60,29 @@ class TestCase(UserInfo):
 
 
 class TestResult(UserInfo):
-    pass
+    result_name: Mapped[str] = mapped_column(String)
+    status_of_executions: Mapped[str] = mapped_column(String)
+    number_of_executions: Mapped[int] = mapped_column(Integer)
+    success_of_executions: Mapped[int] = mapped_column(Integer)
+    fail_of_executions: Mapped[int] = mapped_column(Integer)
+
+    result_items: Mapped[List["TestResultItem"]] = relationship(back_populates="belong_result")
 
 
-class TestResultInfo(UserInfo):
-    pass
+class TestResultItem(UserInfo):
+    """执行结果快照存档表"""
+    interface_id: Mapped[int] = mapped_column(ForeignKey("interface.id"))
+    interface_name: Mapped[str] = mapped_column(String)
+    interface_address: Mapped[str] = mapped_column(String)
+    interface_method: Mapped[str] = mapped_column(String(10))
+
+    testcase_id:Mapped[int] = mapped_column(ForeignKey("test_case.id"))
+    testcase_name: Mapped[str] = mapped_column(String)
+    headers: Mapped[str] = mapped_column(String)
+    params: Mapped[str] = mapped_column(String)
+    expected_results: Mapped[str] = mapped_column(String)
+    actual_results: Mapped[str] = mapped_column(String)
+    execution_status: Mapped[str] = mapped_column(String)
+
+    result_id: Mapped[int] = mapped_column(ForeignKey("test_result.id"))
+    belong_result: Mapped["TestResult"] = relationship(back_populates="result_items")

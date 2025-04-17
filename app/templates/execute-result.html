@@ -1,0 +1,40 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div>
+    <h1>测试结果</h1>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">名称</th>
+            <th scope="col">执行状态</th>
+            <th scope="col">执行数量</th>
+            <th scope="col">成功数量</th>
+            <th scope="col">失败数量</th>
+            <th scope="col">创建时间</th>
+            <th scope="col">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for result in result_list %}
+            <tr>
+                <th scope="row">{{ result.result_name }}</th>
+                <td>{{ result.status_of_executions }}</td>
+                <td>{{ result.number_of_executions }}</td>
+                <td>{{ result.success_of_executions }}</td>
+                <td>{{ result.fail_of_executions }}</td>
+                <td>{{ result.created_time }}</td>
+                <td><a class="btn btn-primary float-right" href="{{ url_for("case.get_result_list", result_id=result.id) }}">详情</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
+{% include "footer.html" %}

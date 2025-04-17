@@ -1,0 +1,37 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>测试结果列表</title>
+</head>
+<body>
+<div>
+    <h1>测试结果</h1>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">用例名称</th>
+            <th scope="col">执行状态</th>
+            <th scope="col">创建时间</th>
+            <th scope="col">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for result in result_list.result_items %}
+            <tr>
+                <th scope="row">{{ result.testcase_name }}</th>
+                <td>{{ result.execution_status }}</td>
+                <td>{{ result.created_time }}</td>
+                <td>
+                    <a class="btn btn-primary float-right" href="#">详情</a>
+                    <a class="btn btn-primary float-right" href="#">编辑</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
+{% include "footer.html" %}

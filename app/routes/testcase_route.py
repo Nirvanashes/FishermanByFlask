@@ -51,9 +51,32 @@ def edit_case(case_id):
         return redirect(url_for("interface.show_interface", interface_id=form.belong_interface.data))
     return render_template("make-case.html", form=form)
 
+
 @case_route.route("/del-case")
 def del_case():
     case_id = request.args.get("case_id")
     interface_id = request.args.get("interface_id")
     TestCaseServices.del_case(case_id)
     return redirect(url_for("interface.show_interface", interface_id=interface_id))
+
+
+@case_route.route("/execute-case")
+def execute_case():
+    # todo 需要修改为从数据库获取
+    interface_list = [1, 2, 3, 4]
+    TestCaseServices.execute_case_by_interface(interface_list)
+    return redirect(url_for("case.executed_result"))
+
+
+@case_route.route("/execute-case-result")
+def executed_result():
+    result_list = TestCaseServices.get_result_list()
+    return render_template("execute-result.html", result_list=result_list)
+
+
+@case_route.route("/execute-case-result-info/<int:result_id>")
+def get_result_list(result_id):
+    result_list = TestCaseServices.get_case_result_list(result_id)
+    return render_template("result-case-list.html", result_list=result_list)
+
+
