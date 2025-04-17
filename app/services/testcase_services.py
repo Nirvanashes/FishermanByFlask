@@ -117,7 +117,6 @@ class TestCaseServices:
             interface = wait_executed_testcase.belong_interface
             request_address = interface.interface_address
             request_method = interface.interface_method
-            # todo 处理headers为空的情况
             if wait_executed_testcase.headers:
                 request_headers = json.loads(wait_executed_testcase.headers)
             else:
