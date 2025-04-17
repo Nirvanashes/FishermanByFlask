@@ -137,7 +137,8 @@ class TestCaseServices:
                 expected_results=wait_executed_testcase.expected_results,
                 actual_results=actual_results,
                 execution_status="",
-                result_id=result_id
+                result_id=result_id,
+                create_user_id=current_user.id
             )
             if wait_executed_testcase.expected_results in actual_results:
                 new_result_item.execution_status = True
