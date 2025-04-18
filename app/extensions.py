@@ -5,7 +5,7 @@ from flask_bootstrap import Bootstrap5
 # from flask_ckeditor import CKEditor
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Integer
+from sqlalchemy import Integer, Select
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
 from flask_mail import Mail
 from flask_caching import Cache
@@ -45,3 +45,19 @@ def init_extensions(app):
     login_manager.login_message_category = "warning"
     mail.init_app(app)
     cache.init_app(app)
+
+
+def paginate(query: Select, page: int = 1, per_page: int = 10):
+    """
+    通用分页函数
+    :param query: SQLAlchemy查询对象
+    :param page: 当前页码
+    :param per_page: 每页数量
+    :return: 分页对象
+    """
+    return db.paginate(
+        query,
+        page=page,
+        per_page=per_page,
+        error_out=False
+    )

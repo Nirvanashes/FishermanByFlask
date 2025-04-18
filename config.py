@@ -10,3 +10,5 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get("DB_URI", "sqlite:///fisher.db")
     APP_DEBUG = os.environ.get("DEBUG")
     PORT = os.environ.get("PORT")
+    # 分页配置
+    ITEMS_PER_PAGE = 10  # 默认每页显示数量

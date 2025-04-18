@@ -2,8 +2,9 @@ import datetime
 import json
 from typing import List
 from flask_login import current_user
+from flask_sqlalchemy.pagination import Pagination
 from sqlalchemy import select, func, except_
-from app.extensions import db
+from app.extensions import db, paginate
 from app.forms import InterfaceTestcaseFrom
 from app.schema import TestCase, TestResultItem, TestResult
 import requests
@@ -205,6 +206,11 @@ class TestCaseServices:
             select(TestResult)
             .order_by(TestResult.updated_time.desc())
         ).all()
+
+    @staticmethod
+    def get_result_list_page(page: int) -> Pagination:
+        """获取所有测试结果（按更新时间排序）"""
+        return paginate(query=select(TestResult).order_by(TestResult.updated_time.desc()), page=page)
 
     @staticmethod
     def get_case_result_list(result_id: int) -> TestResult:

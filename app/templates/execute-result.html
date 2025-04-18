@@ -1,5 +1,5 @@
 {% include "header.html" %}
-<!DOCTYPE html>
+{% from 'bootstrap4/pagination.html' import render_pagination %}<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -35,6 +35,7 @@
         </tbody>
     </table>
 </div>
+{{ render_pagination(result_list) }}
 </body>
 </html>
 {% include "footer.html" %}

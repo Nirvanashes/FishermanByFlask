@@ -74,8 +74,9 @@ def execute_case():
 
 @case_route.route("/execute-case-result")
 def executed_result():
-    result_list = TestCaseServices.get_result_list()
-    return render_template("execute-result.html", result_list=result_list)
+    page = request.args.get("page",1,type=int)
+    pagination = TestCaseServices.get_result_list_page(page=page)
+    return render_template("execute-result.html", result_list=pagination)
 
 
 @case_route.route("/execute-case-result-info/<int:result_id>")
