@@ -1,5 +1,7 @@
 {% include "header.html" %}
 {% from "bootstrap5/form.html" import render_form %}
+{% from 'bootstrap5/pagination.html' import render_pagination %}
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -32,6 +34,8 @@
         <hr class="my-4"/>
     {% endfor %}
 </div>
+{{ render_pagination(projects) }}
+
 </body>
 </html>
 {% include "footer.html" %}

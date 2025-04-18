@@ -1,7 +1,7 @@
 from flask_login import current_user
 from sqlalchemy import select
 
-from app.extensions import db
+from app.extensions import db, paginate
 from app.forms import InterfaceForm
 from app.schema import Interface
 from app.services.project_services import ProjectServices
@@ -64,4 +64,8 @@ class InterfaceServices:
         db.session.delete(interface)
         db.session.commit()
         return True
+
+    @staticmethod
+    def get_all_interface_by_page(page):
+        return paginate(query=select(Interface),page=page)
 

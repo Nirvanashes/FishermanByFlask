@@ -9,6 +9,7 @@ from sqlalchemy import Integer, Select
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
 from flask_mail import Mail
 from flask_caching import Cache
+from config import Config
 
 
 class Base(DeclarativeBase):
@@ -47,7 +48,7 @@ def init_extensions(app):
     cache.init_app(app)
 
 
-def paginate(query: Select, page: int = 1, per_page: int = 10):
+def paginate(query: Select, page: int = 1, per_page: int = Config.ITEMS_PER_PAGE):
     """
     通用分页函数
     :param query: SQLAlchemy查询对象

@@ -1,5 +1,6 @@
 import datetime
 import json
+from pydoc import pager
 from typing import List
 from flask_login import current_user
 from flask_sqlalchemy.pagination import Pagination
@@ -24,6 +25,12 @@ class TestCaseServices:
             select(TestCase)
             .where(TestCase.belong_interface_id == interface_id)
         ).all()
+
+    @staticmethod
+    def get_case_by_interface_id_page(interface_id: int, page: int):
+        """通过接口ID获取用例"""
+        return paginate(select(TestCase)
+                        .where(TestCase.belong_interface_id == interface_id), page=page)
 
     @staticmethod
     def get_case_by_interface_list(interface_list: List[int]) -> List[TestCase]:
@@ -217,5 +224,10 @@ class TestCaseServices:
         return db.session.scalar(
             select(TestResult)
             .where(TestResult.id == result_id)
-            # .options(contains_eager(TestResult.items))
+        )
+
+    @staticmethod
+    def get_case_result_page(result_id: int, page: int):
+        return paginate(
+            query=select(TestResultItem).where(TestResultItem.result_id == result_id), page=page
         )

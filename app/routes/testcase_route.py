@@ -81,5 +81,6 @@ def executed_result():
 
 @case_route.route("/execute-case-result-info/<int:result_id>")
 def get_result_list(result_id):
-    result_list = TestCaseServices.get_case_result_list(result_id)
+    page = request.args.get("page",1,type=int)
+    result_list = TestCaseServices.get_case_result_page(result_id,page=page)
     return render_template("result-case-list.html", result_list=result_list)

@@ -1,7 +1,7 @@
 from flask_login import current_user
 from sqlalchemy import select
 
-from app.extensions import db
+from app.extensions import db, paginate
 from app.schema import Project
 
 
@@ -9,6 +9,10 @@ class ProjectServices:
     @staticmethod
     def get_all_projects():
         return db.session.scalars(select(Project)).all()
+
+    @staticmethod
+    def get_all_projects_by_page(page):
+        return paginate(query=select(Project),page=page)
 
     @staticmethod
     def get_project_by_id(project_id: int):

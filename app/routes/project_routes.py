@@ -9,7 +9,8 @@ pj_bp = Blueprint("project", __name__)
 
 @pj_bp.route("/projects")
 def get_all_projects():
-    projects = ProjectServices.get_all_projects()
+    page = request.args.get("page",1,type=int)
+    projects = ProjectServices.get_all_projects_by_page(page)
     return render_template("project.html", projects=projects)
 
 
