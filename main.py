@@ -1,4 +1,5 @@
 from flask import Flask, render_template
+from flask_login import login_required
 from sqlalchemy import select
 
 from app.extensions import init_extensions, db
@@ -25,6 +26,7 @@ app.register_blueprint(case_route)
 
 
 @app.route("/")
+@login_required
 def welcome():
     data = ProjectServices.fitter_interface_by_product()
     df = pd.DataFrame(data, columns=['project_name', 'interface_count'])

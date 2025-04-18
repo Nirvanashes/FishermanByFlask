@@ -1,3 +1,4 @@
+{% from 'bootstrap5/nav.html' import render_nav_item %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,76 +43,21 @@
 </head>
 <body>
 <!-- Navigation-->
-<nav class="navbar navbar-expand-lg navbar-light" id="mainNav">
-    <div class="container px-4 px-lg-5">
-        <a class="navbar-brand" href="/">Fisher AutoTest Project</a>
-        <button
-                class="navbar-toggler"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#navbarResponsive"
-                aria-controls="navbarResponsive"
-                aria-expanded="false"
-                aria-label="Toggle navigation"
-        >
-            Menu
-            <i class="fas fa-bars"></i>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-            <ul class="navbar-nav ms-auto py-4 py-lg-0">
-                {#            <li class="nav-item">#}
-                {#              <a#}
-                {#                class="nav-link px-lg-3 py-3 py-lg-4"#}
-                {#                href="{{ url_for('blog.get_all_posts') }}"#}
-                {#                >Home</a#}
-                {#              >#}
-                {#            </li>#}
-                {% if not current_user.is_authenticated: %}
-                    <li class="nav-item">
-                        <a
-                                class="nav-link px-lg-3 py-3 py-lg-4"
-                                href="{{ url_for('auth.login') }}"
-                        >Login</a
-                        >
-                    </li>
-                    <li class="nav-item">
-                        <a
-                                class="nav-link px-lg-3 py-3 py-lg-4"
-                                href="{{ url_for('auth.register') }}"
-                        >Register</a
-                        >
-                    </li>
-                {% else: %}
-                    <li class="nav-item">
-                        <a
-                                class="nav-link px-lg-3 py-3 py-lg-4"
-                                href="{{ url_for('project.get_all_projects') }}"
-                        >Project</a>
-                    </li>
-                    <li class="nav-item">
-                        <a
-                                class="nav-link px-lg-3 py-3 py-lg-4"
-                                href="{{ url_for('interface.get_all_interface') }}"
-                        >Interface</a>
-                    </li>
-                    <li class="nav-item">
-                        <a
-                                class="nav-link px-lg-3 py-3 py-lg-4"
-                                href="{{ url_for('case.executed_result') }}"
-                        >Test Result</a>
-                    </li>
-                    <li class="nav-item">
-                        <a
-                                class="nav-link px-lg-3 py-3 py-lg-4"
-                                href="{{ url_for('auth.logout') }}"
-                        >Log Out</a
-                        >
-                    </li>
-                {% endif %}
-            </ul>
-        </div>
+<nav class="navbar navbar-expand-xxl navbar-light bg-light bg-body-tertiary justify-content-end nav-pills">
+    <div class="navbar-nav mr-auto">
+    {{ render_nav_item("welcome", _badge="Fisher AutoTest Project") }}
+        {% if not current_user.is_authenticated %}
+            {{ render_nav_item("auth.login", '登录') }}
+            {{ render_nav_item("auth.register", '注册') }}
+        {% else: %}
+            {{ render_nav_item('project.get_all_projects', '项目') }}
+            {{ render_nav_item('interface.get_all_interface', '接口') }}
+            {{ render_nav_item('case.executed_result', '测试结果') }}
+            {{ render_nav_item('auth.logout', '注销') }}
+        {% endif %}
     </div>
 </nav>
+
 
 </body>
 </html>

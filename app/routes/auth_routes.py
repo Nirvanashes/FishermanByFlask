@@ -21,7 +21,7 @@ def register():
             password=form.password.data
         )
         login_user(new_user)
-        return render_template("index.html")
+        return redirect(url_for("welcome"))
     return render_template("login.html", form=form, is_login=False)
 
 
@@ -32,9 +32,9 @@ def login():
         user = AuthServices.get_user_by_email(form.email.data)
         if user and check_password(user.password, form.password.data):
             login_user(user)
-            return render_template("index.html")
+            return redirect(url_for("welcome"))
         else:
-            flash("the email or password is incorrect, please try again.")
+            flash("邮箱或密码不正确，请重新尝试")
             return redirect(url_for("auth.login"))
     return render_template("login.html", form=form, is_login=True)
 

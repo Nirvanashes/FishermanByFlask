@@ -3,15 +3,24 @@
 
 {% block title %}
     {% if is_login %}
-        Login
+        登录
     {% else %}
-        Register
+        注册
     {% endif %}
 {% endblock %}
 
 {% block content %}
-	<div>
-        {{ render_form(form) }}
+    <div class="mb-3">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                        </div>
+                    {% endfor %}
+            {% endif %}
+        {% endwith %}
     </div>
+        {{ render_form(form,form_type="horizontal") }}
 {% endblock %}
 
