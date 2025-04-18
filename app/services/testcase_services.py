@@ -1,7 +1,8 @@
 import datetime
 import json
+from typing import List
 from flask_login import current_user
-from sqlalchemy import select, func
+from sqlalchemy import select, func, except_
 from app.extensions import db
 from app.forms import InterfaceTestcaseFrom
 from app.schema import TestCase, TestResultItem, TestResult
@@ -11,29 +12,43 @@ import requests
 class TestCaseServices:
     # -------------------------------------- 数据库获取数据 -------------------------------------- #
     @staticmethod
-    def get_all_case():
-        return db.session.scalars(TestCase).all()
+    def get_all_case() -> List[TestCase]:
+        """获取所有测试用例"""
+        return db.session.scalars(select(TestCase)).all()
 
     @staticmethod
-    def get_case_by_interface_id(interface_id):
-        return db.session.scalars(select(TestCase).where(TestCase.belong_interface_id == interface_id)).all()
+    def get_case_by_interface_id(interface_id: int) -> List[TestCase]:
+        """通过接口ID获取用例"""
+        return db.session.scalars(
+            select(TestCase)
+            .where(TestCase.belong_interface_id == interface_id)
+        ).all()
 
     @staticmethod
-    def get_case_by_interface_list(interface_list):
-        return db.session.scalars(select(TestCase).where(TestCase.belong_interface_id.in_(interface_list))).all()
+    def get_case_by_interface_list(interface_list: List[int]) -> List[TestCase]:
+        """通过多个接口ID获取用例"""
+        return db.session.scalars(
+            select(TestCase)
+            .where(TestCase.belong_interface_id.in_(interface_list))
+        ).all()
 
     @staticmethod
-    def get_case_by_id(case_id):
-        return db.session.scalars(select(TestCase).where(TestCase.id == case_id)).all()
+    def get_case_by_id(case_id: int) -> TestCase:
+        """通过ID获取单个用例"""
+        return db.session.scalar(select(TestCase).where(TestCase.id == case_id))
 
     @staticmethod
-    def get_case_by_case_id_list(case_id_list):
-        return db.session.scalars(select(TestCase).where(TestCase.id.in_(case_id_list))).all()
+    def get_case_by_case_id_list(case_id_list: List[int]) -> List[TestCase]:
+        """通过多个ID获取用例"""
+        return db.session.scalars(
+            select(TestCase)
+            .where(TestCase.id.in_(case_id_list))
+        ).all()
 
-    # -------------------------------------- 接口交互 -------------------------------------- #
+    # -------------------------------------- 增删改查操作 -------------------------------------- #
 
     @staticmethod
-    def add_case(form: InterfaceTestcaseFrom):
+    def add_case(form: InterfaceTestcaseFrom) -> TestCase:
         new_case = TestCase(
             testcase_name=form.testcase_name.data,
             headers=form.headers.data,
@@ -48,7 +63,7 @@ class TestCaseServices:
         return new_case
 
     @staticmethod
-    def edit_case(case_id, form: InterfaceTestcaseFrom):
+    def edit_case(case_id, form: InterfaceTestcaseFrom) -> TestCase:
         case = TestCaseServices.get_case_by_id(case_id)
         case.testcase_name = form.testcase_name.data
         case.params = form.params.data
@@ -69,72 +84,43 @@ class TestCaseServices:
     # -------------------------------------- 执行接口测试 -------------------------------------- #
 
     @staticmethod
-    def execute_case_by_interface(interface_list: list):
-        # todo 看后续是否需要转为异步执行
-        # 1.获取应该执行的用例,创建执行结果
-        wait_executed_testcase_list = TestCaseServices.get_wait_testcase_list_by_interface(interface_list)
+    def execute_test_cases(id_list: list, is_interface: bool) -> TestResult:
+        """
+        执行测试用例的通用方法
+        :param id_list: 接口ID列表或用例ID列表
+        :param is_interface: 是否为接口执行模式
+        :return: 测试结果
+        """
+        # 1. 获取待执行用例
+        wait_executed_testcase_list = (
+            TestCaseServices.get_case_by_interface_list(id_list)
+            if is_interface
+            else TestCaseServices.get_case_by_case_id_list(id_list)
+        )
 
-        # 2.创建预先执行结果数据
-        result = TestCaseServices.create_test_result(interface_list, is_interface=True)
+        # 2. 创建测试结果
+        result = TestCaseServices.create_test_result(len(wait_executed_testcase_list))
 
-        # 3.执行用例并写入结果快照表
-        executed_result = TestCaseServices.execute_case(result, wait_executed_testcase_list)
-
-    @staticmethod
-    def execute_case_by_case(case_list: list):
-        # todo 看后续是否需要转为异步执行
-        # 1.获取应该执行的用例,创建执行结果
-        wait_executed_testcase_list = TestCaseServices.get_wait_testcase_list_by_case_id_list(case_list)
-
-        # 2.创建预先执行结果数据
-        result = TestCaseServices.create_test_result(wait_executed_testcase_list, is_interface=False)
-
-        # 3.执行用例并写入结果快照表
-        executed_result = TestCaseServices.execute_case(result, wait_executed_testcase_list)
+        # 3. 执行用例并记录结果
+        return TestCaseServices.execute_case(result=result, testcases=wait_executed_testcase_list)
 
     @staticmethod
-    def get_wait_testcase_list_by_interface(interface_list):
-        wait_executed_testcase_list = [
-            testcase
-            for interface_id in interface_list
-            for testcase in TestCaseServices.get_case_by_interface_id(interface_id)
-            if testcase
-        ]
-        return wait_executed_testcase_list
+    def execute_case_by_interface(interface_list: list) -> TestResult:
+        """通过接口执行用例（兼容旧代码）"""
+        return TestCaseServices.execute_test_cases(interface_list, is_interface=True)
 
     @staticmethod
-    # todo 考虑性能，后续看是选择使用id还是id_list获取
-    def get_wait_testcase_list_by_case_id_list(case_id_list):
-        wait_executed_testcase_list = [
-            testcase
-            for case_id in case_id_list
-            for testcase in TestCaseServices.get_case_by_id(case_id)
-            if testcase
-        ]
-        # wait_executed_testcase_list = [
-        #     testcase
-        #     for testcase in TestCaseServices.get_case_by_case_id_list(case_id_list)
-        #     if testcase
-        # ]
-        return wait_executed_testcase_list
+    def execute_case_by_case(case_list: list) -> TestResult:
+        """直接执行用例（兼容旧代码）"""
+        return TestCaseServices.execute_test_cases(case_list, is_interface=False)
 
     @staticmethod
-    def create_test_result(list, is_interface):
-        """通过接口列表或者用例列表获取待执行数量"""
-        number_of_executions = 0
-        # todo 通过接口列表或者用例列表获取待执行数量，根据is_interface参数判断？
-        if is_interface:
-            number_of_executions = db.session.scalar(
-                select(func.count(TestCase.id))
-                .where(TestCase.belong_interface_id.in_(list))
-            )
-        else:
-            number_of_executions = len(list)
-
+    def create_test_result(testcase_count: int) -> TestResult:
+        """创建测试结果记录"""
         new_result = TestResult(
             result_name=f"测试结果-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}",
-            status_of_executions="ING",
-            number_of_executions=number_of_executions,
+            status_of_executions="执行中",
+            number_of_executions=testcase_count,
             success_of_executions=0,
             fail_of_executions=0,
             create_user_id=current_user.id
@@ -144,58 +130,69 @@ class TestCaseServices:
         return new_result
 
     @staticmethod
-    def execute_case(result, wait_executed_testcase_list: list[TestCase]):
-        # 将执行成功、失败用例合成一个二元列表返回：
-        success_list = fail_list = [TestResultItem]
-        success_num = fail_num = 0
+    def execute_case(result, testcases: list[TestCase]):
+        success_count = 0
+        fail_count = 0
 
-        for wait_executed_testcase in wait_executed_testcase_list:
-            interface = wait_executed_testcase.belong_interface
+        for testcase in testcases:
+            interface = testcase.belong_interface
             request_address = interface.interface_address
             request_method = interface.interface_method
-            if wait_executed_testcase.headers:
-                request_headers = json.loads(wait_executed_testcase.headers)
-            else:
-                request_headers = ""
-            request_params = wait_executed_testcase.params
-            response = requests.request(method=request_method,
-                                        url=request_address,
-                                        headers=request_headers,
-                                        data=request_params
-                                        # params=request_params
-                                        )
-            actual_results = json.dumps(response.json())
-            new_result_item = TestResultItem(
-                interface_id=interface.id,
-                interface_name=interface.interface_name,
-                interface_address=interface.interface_address,
-                interface_method=interface.interface_method,
-                testcase_id=wait_executed_testcase.id,
-                testcase_name=wait_executed_testcase.testcase_name,
-                headers=wait_executed_testcase.headers,
-                params=wait_executed_testcase.params,
-                expected_results=wait_executed_testcase.expected_results,
-                actual_results=actual_results,
-                execution_status="",
-                result_id=result.id,
-                belong_result=result,
-                create_user_id=current_user.id
-            )
-            if wait_executed_testcase.expected_results in actual_results:
-                new_result_item.execution_status = True
-                success_num += 1
-                success_list.append(new_result_item)
-            else:
-                new_result_item.execution_status = False
-                fail_num += 1
-                fail_list.append(new_result_item)
-            db.session.add(new_result_item)
-            db.session.commit()
+            request_headers = json.loads(testcase.headers) if testcase.headers else {}
+            request_params = testcase.params
+            try:
+                response = requests.request(method=request_method,
+                                            url=request_address,
+                                            headers=request_headers,
+                                            data=request_params
+                                            )
+                response.raise_for_status()
+                actual_results = json.dumps(response.json())
+
+                result_item = TestResultItem(
+                    interface_id=interface.id,
+                    interface_name=interface.interface_name,
+                    interface_address=interface.interface_address,
+                    interface_method=interface.interface_method,
+                    testcase_id=testcase.id,
+                    testcase_name=testcase.testcase_name,
+                    headers=testcase.headers,
+                    params=testcase.params,
+                    expected_results=testcase.expected_results,
+                    actual_results=actual_results,
+                    execution_status=testcase.expected_results in actual_results,
+                    result_id=result.id,
+                    belong_result=result,
+                    create_user_id=current_user.id
+                )
+                if result_item.execution_status:
+                    success_count += 1
+                else:
+                    fail_count += 1
+                db.session.add(result_item)
+            except Exception as e:
+                fail_count += 1
+                db.session.add(TestResultItem(
+                    interface_id=interface.id,
+                    interface_name=interface.interface_name,
+                    interface_address=interface.interface_address,
+                    interface_method=interface.interface_method,
+                    testcase_id=testcase.id,
+                    testcase_name=testcase.testcase_name,
+                    headers=testcase.headers,
+                    params=testcase.params,
+                    expected_results=testcase.expected_results,
+                    actual_results=str(e),
+                    execution_status=False,
+                    result_id=result.id,
+                    belong_result=result,
+                    create_user_id=current_user.id
+                ))
 
         # 更新结果表数据
         result.status_of_executions = "Finish"
-        result.success_of_executions = success_num
-        result.fail_of_executions = fail_num
+        result.success_of_executions = success_count
+        result.fail_of_executions = fail_count
         db.session.commit()
         return result
 
@@ -206,5 +203,9 @@ class TestCaseServices:
         return db.session.scalars(select(TestResult).order_by(TestResult.updated_time.desc())).all()
 
     @staticmethod
-    def get_case_result_list(result_id):
-        return db.get_or_404(TestResult, result_id)
+    def get_case_result_list(result_id: int) -> TestResult:
+        return db.session.scalar(
+            select(TestResult)
+            .where(TestResult.id == result_id)
+            # .options(contains_eager(TestResult.items))
+        )
