@@ -199,8 +199,12 @@ class TestCaseServices:
     # -------------------------------------------------执行结果列表相关------------------------------------------------- #
 
     @staticmethod
-    def get_result_list():
-        return db.session.scalars(select(TestResult).order_by(TestResult.updated_time.desc())).all()
+    def get_result_list() -> List[TestResult]:
+        """获取所有测试结果（按更新时间排序）"""
+        return db.session.scalars(
+            select(TestResult)
+            .order_by(TestResult.updated_time.desc())
+        ).all()
 
     @staticmethod
     def get_case_result_list(result_id: int) -> TestResult:
