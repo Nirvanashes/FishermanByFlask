@@ -9,17 +9,28 @@ import requests
 
 
 class TestCaseServices:
+    # -------------------------------------- 数据库获取数据 -------------------------------------- #
     @staticmethod
     def get_all_case():
         return db.session.scalars(TestCase).all()
 
     @staticmethod
-    def get_case_by_interface(interface_id):
+    def get_case_by_interface_id(interface_id):
         return db.session.scalars(select(TestCase).where(TestCase.belong_interface_id == interface_id)).all()
 
     @staticmethod
+    def get_case_by_interface_list(interface_list):
+        return db.session.scalars(select(TestCase).where(TestCase.belong_interface_id.in_(interface_list))).all()
+
+    @staticmethod
     def get_case_by_id(case_id):
-        return db.get_or_404(TestCase, case_id)
+        return db.session.scalars(select(TestCase).where(TestCase.id == case_id)).all()
+
+    @staticmethod
+    def get_case_by_case_id_list(case_id_list):
+        return db.session.scalars(select(TestCase).where(TestCase.id.in_(case_id_list))).all()
+
+    # -------------------------------------- 接口交互 -------------------------------------- #
 
     @staticmethod
     def add_case(form: InterfaceTestcaseFrom):
@@ -55,45 +66,70 @@ class TestCaseServices:
         db.session.delete(case)
         db.session.commit()
 
+    # -------------------------------------- 执行接口测试 -------------------------------------- #
+
     @staticmethod
     def execute_case_by_interface(interface_list: list):
+        # todo 看后续是否需要转为异步执行
         # 1.获取应该执行的用例,创建执行结果
-        wait_executed_testcase_list = TestCaseServices.get_wait_testcase_list(interface_list)
+        wait_executed_testcase_list = TestCaseServices.get_wait_testcase_list_by_interface(interface_list)
 
         # 2.创建预先执行结果数据
-        result_id = TestCaseServices.create_test_result(interface_list, wait_executed_testcase_list)
+        result = TestCaseServices.create_test_result(interface_list, is_interface=True)
 
         # 3.执行用例并写入结果快照表
-        executed_result = TestCaseServices.execute_case(result_id, wait_executed_testcase_list)
-
-        # 4.更新结果表数据
-        result = db.get_or_404(TestResult, result_id)
-        result.status_of_executions = executed_result.get("status_of_executions","err")
-        result.success_of_executions = executed_result.get("success_num",0)
-        result.fail_of_executions = executed_result.get("fail_num", 0)
-        db.session.commit()
+        executed_result = TestCaseServices.execute_case(result, wait_executed_testcase_list)
 
     @staticmethod
-    def get_wait_testcase_list(interface_list):
+    def execute_case_by_case(case_list: list):
+        # todo 看后续是否需要转为异步执行
+        # 1.获取应该执行的用例,创建执行结果
+        wait_executed_testcase_list = TestCaseServices.get_wait_testcase_list_by_case_id_list(case_list)
+
+        # 2.创建预先执行结果数据
+        result = TestCaseServices.create_test_result(wait_executed_testcase_list, is_interface=False)
+
+        # 3.执行用例并写入结果快照表
+        executed_result = TestCaseServices.execute_case(result, wait_executed_testcase_list)
+
+    @staticmethod
+    def get_wait_testcase_list_by_interface(interface_list):
         wait_executed_testcase_list = [
             testcase
             for interface_id in interface_list
-            for testcase in TestCaseServices.get_case_by_interface(interface_id)
+            for testcase in TestCaseServices.get_case_by_interface_id(interface_id)
             if testcase
         ]
         return wait_executed_testcase_list
 
     @staticmethod
-    def create_test_result(interface_list, wait_executed_testcase_list):
+    # todo 考虑性能，后续看是选择使用id还是id_list获取
+    def get_wait_testcase_list_by_case_id_list(case_id_list):
+        wait_executed_testcase_list = [
+            testcase
+            for case_id in case_id_list
+            for testcase in TestCaseServices.get_case_by_id(case_id)
+            if testcase
+        ]
+        # wait_executed_testcase_list = [
+        #     testcase
+        #     for testcase in TestCaseServices.get_case_by_case_id_list(case_id_list)
+        #     if testcase
+        # ]
+        return wait_executed_testcase_list
+
+    @staticmethod
+    def create_test_result(list, is_interface):
         """通过接口列表或者用例列表获取待执行数量"""
         number_of_executions = 0
-        # 通过接口列表或者用例列表获取待执行数量
-        if interface_list:
+        # todo 通过接口列表或者用例列表获取待执行数量，根据is_interface参数判断？
+        if is_interface:
             number_of_executions = db.session.scalar(
                 select(func.count(TestCase.id))
-                .where(TestCase.belong_interface_id.in_(interface_list)))
+                .where(TestCase.belong_interface_id.in_(list))
+            )
         else:
-            number_of_executions = len(wait_executed_testcase_list)
+            number_of_executions = len(list)
 
         new_result = TestResult(
             result_name=f"测试结果-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}",
@@ -105,10 +141,10 @@ class TestCaseServices:
         )
         db.session.add(new_result)
         db.session.commit()
-        return new_result.id
+        return new_result
 
     @staticmethod
-    def execute_case(result_id, wait_executed_testcase_list: list[TestCase]):
+    def execute_case(result, wait_executed_testcase_list: list[TestCase]):
         # 将执行成功、失败用例合成一个二元列表返回：
         success_list = fail_list = [TestResultItem]
         success_num = fail_num = 0
@@ -141,7 +177,8 @@ class TestCaseServices:
                 expected_results=wait_executed_testcase.expected_results,
                 actual_results=actual_results,
                 execution_status="",
-                result_id=result_id,
+                result_id=result.id,
+                belong_result=result,
                 create_user_id=current_user.id
             )
             if wait_executed_testcase.expected_results in actual_results:
@@ -155,13 +192,11 @@ class TestCaseServices:
             db.session.add(new_result_item)
             db.session.commit()
 
-        result = {
-            "status_of_executions": "Finish",
-            "success": success_list,
-            "success_num": success_num,
-            "fail": fail_list,
-            "fail_num": fail_num,
-        }
+        # 更新结果表数据
+        result.status_of_executions = "Finish"
+        result.success_of_executions = success_num
+        result.fail_of_executions = fail_num
+        db.session.commit()
         return result
 
     # -------------------------------------------------执行结果列表相关------------------------------------------------- #

@@ -15,7 +15,7 @@ def get_all_case():
 
 @case_route.route("/all-case/<int:interface_id>")
 def get_all_case_by_interface(interface_id):
-    all_case = TestCaseServices.get_case_by_interface(interface_id)
+    all_case = TestCaseServices.get_case_by_interface_id(interface_id)
     return render_template("case.html", all_case=all_case)
 
 
@@ -62,9 +62,13 @@ def del_case():
 
 @case_route.route("/execute-case")
 def execute_case():
-    # todo 需要修改为从数据库获取
-    interface_list = [1, 2, 3, 4]
-    TestCaseServices.execute_case_by_interface(interface_list)
+    # todo 需要修改为从数据库获取，新增form表单从页面获取？
+    interface_list = [request.args.get("interface_id")]
+    case_list = [request.args.get("case_id")]
+    if interface_list and interface_list[0]:
+        TestCaseServices.execute_case_by_interface(interface_list)
+    else:
+        TestCaseServices.execute_case_by_case(case_list)
     return redirect(url_for("case.executed_result"))
 
 
@@ -78,5 +82,3 @@ def executed_result():
 def get_result_list(result_id):
     result_list = TestCaseServices.get_case_result_list(result_id)
     return render_template("result-case-list.html", result_list=result_list)
-
-

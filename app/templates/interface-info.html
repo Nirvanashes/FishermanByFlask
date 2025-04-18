@@ -32,7 +32,12 @@
             <div>
                 <h3>{{ case.testcase_name }}</h3>
 {#                <div class="d-flex justify-content-end mb-4">#}
-                    <a
+                <a
+                            class="btn btn-primary float-right justify-content-end mb-4"
+                            href="{{ url_for('case.execute_case', case_id=case.id) }}"
+                    >Execute Case</a
+                    >
+                <a
                             class="btn btn-primary float-right justify-content-end mb-4"
                             href="{{ url_for('case.edit_case', case_id=case.id) }}"
                     >Edit Case</a
