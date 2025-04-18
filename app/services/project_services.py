@@ -1,8 +1,8 @@
 from flask_login import current_user
-from sqlalchemy import select
+from sqlalchemy import select, func
 
 from app.extensions import db, paginate
-from app.schema import Project
+from app.schema import Project, Interface
 
 
 class ProjectServices:
@@ -12,7 +12,7 @@ class ProjectServices:
 
     @staticmethod
     def get_all_projects_by_page(page):
-        return paginate(query=select(Project),page=page)
+        return paginate(query=select(Project), page=page)
 
     @staticmethod
     def get_project_by_id(project_id: int):
@@ -54,3 +54,15 @@ class ProjectServices:
         db.session.delete(project)
         db.session.commit()
         return True
+
+    @staticmethod
+    def fitter_interface_by_product():
+        result = db.session.execute(
+            select(
+                Project.name.label('project_name'),
+                func.count(Interface.id).label('interface_count')
+            )
+            .join(Interface, Project.interfaces)
+            .group_by(Project.name)
+        ).fetchall()
+        return result

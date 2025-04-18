@@ -3,5 +3,9 @@
 	首页
 {% endblock %}
 {% block content %}
-	<h1>Welcome</h1>
+    <h1>各项目接口数量统计</h1>
+    <div id="chart">
+        <!-- 图表将在这里渲染 -->
+        {{ chart_html|safe }}
+    </div>
 {% endblock %}
