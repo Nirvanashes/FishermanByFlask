@@ -16,7 +16,7 @@ def generate_password(password: str) -> str:
     return generate_password_hash(
         password=password,
         method=Config.PASSWORD_HASH_METHOD,
-        salt_length=16
+        salt_length=4
     )
 
 
