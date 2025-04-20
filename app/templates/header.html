@@ -43,7 +43,7 @@
 </head>
 <body>
 <!-- Navigation-->
-<nav class="navbar navbar-expand-xxl navbar-light bg-light bg-body-tertiary justify-content-end nav-pills">
+<nav class="navbar navbar-expand-xxl bg-body-tertiary justify-content-end nav-pills">
     <div class="navbar-nav mr-auto">
     {{ render_nav_item("welcome", _badge="Fisher AutoTest Project") }}
         {% if not current_user.is_authenticated %}
@@ -57,7 +57,6 @@
         {% endif %}
     </div>
 </nav>
-
-
+{{ bootstrap.load_js() }}
 </body>
 </html>
