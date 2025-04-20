@@ -15,7 +15,7 @@ class UserInfo(db.Model):
 class User(UserMixin, db.Model):
     # id: Mapped[int] = mapped_column(Integer, primary_key=True) #迁移至Base类中统一生成
     email: Mapped[str] = mapped_column(String(100), unique=True)
-    password: Mapped[str] = mapped_column(String(100))
+    password: Mapped[str] = mapped_column(String(500))
     name: Mapped[str] = mapped_column(String(100))
     default_project: Mapped[int] = mapped_column(Integer, nullable=True)
 
