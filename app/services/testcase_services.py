@@ -7,7 +7,7 @@ from flask_sqlalchemy.pagination import Pagination
 from sqlalchemy import select, func, except_
 from app.extensions import db, paginate
 from app.forms import InterfaceTestcaseFrom
-from app.schema import TestCase, TestResultItem, TestResult
+from app.schema import TestCase, TestResultItem, TestResult, Project, Interface
 import requests
 
 
@@ -231,3 +231,24 @@ class TestCaseServices:
         return paginate(
             query=select(TestResultItem).where(TestResultItem.result_id == result_id), page=page
         )
+
+    @staticmethod
+    def get_case_executed_result_by_id(case_executed_result_id):
+        return db.get_or_404(TestResultItem, case_executed_result_id)
+
+    @staticmethod
+    def fitter_testcase_by_interface_and_product():
+        # 执行查询并获取结果
+        result = db.session.execute(
+            select(
+                Project.name.label('project_name'),
+                Interface.interface_name.label("interface_name"),
+                func.count(TestCase.id).label("testcase_count")
+            )
+            .select_from(Project)
+            .join(Interface, Project.interfaces)
+            .join(TestCase, Interface.testcases)
+            .group_by(Project.id, Interface.id)
+        ).mappings()
+
+        return result

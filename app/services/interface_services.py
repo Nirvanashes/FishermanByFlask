@@ -1,9 +1,9 @@
 from flask_login import current_user
-from sqlalchemy import select
+from sqlalchemy import select, func
 
 from app.extensions import db, paginate
 from app.forms import InterfaceForm
-from app.schema import Interface
+from app.schema import Interface, TestCase
 from app.services.project_services import ProjectServices
 
 
@@ -67,5 +67,16 @@ class InterfaceServices:
 
     @staticmethod
     def get_all_interface_by_page(page):
-        return paginate(query=select(Interface),page=page)
+        return paginate(query=select(Interface), page=page)
 
+    @staticmethod
+    def fitter_testcase_by_interface():
+        result = db.session.execute(
+            select(
+                Interface.interface_name.label("interface_name"),
+                func.count(TestCase.id).label("testcase_count")
+            )
+            .join(TestCase, Interface.testcases)
+            .group_by(Interface.id)
+        ).fetchall()
+        return result

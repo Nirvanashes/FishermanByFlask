@@ -63,6 +63,6 @@ class ProjectServices:
                 func.count(Interface.id).label('interface_count')
             )
             .join(Interface, Project.interfaces)
-            .group_by(Project.name)
+            .group_by(Project.id)
         ).fetchall()
         return result

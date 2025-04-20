@@ -1,41 +1,37 @@
-{% include "header.html" %}
+{% extends "base.html" %}
 {% from "bootstrap5/form.html" import render_form %}
 {% from 'bootstrap5/pagination.html' import render_pagination %}
 
+{% block title %}
+    项目
+{% endblock %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-<div>
-    {% if current_user.is_authenticated %}
-        <div class="d-flex mb-4">
-            <a
-                    class="btn btn-primary float-right"
-                    href="{{ url_for('project.add_project') }}"
-            >Create New Project</a
-            >
-        </div>
-    {% endif %}
-</div>
-<div class="row gx-4 gx-lg-5 justify-content-center">
-    {% for project in projects %}
-        <div>
-            <h3 class="d-flex mb-4">项目名称：{{ project.name }}
-                <a class="btn btn-primary float-right"
-                   href="{{ url_for("project.edit_project",project_id=project.id) }}">Edit</a>
-                <a class="btn btn-primary float-right"
-                   href="{{ url_for("project.del_project",project_id=project.id) }}">Delete</a>
-            </h3>
-        </div>
-        <hr class="my-4"/>
-    {% endfor %}
-</div>
-{{ render_pagination(projects) }}
-
-</body>
-</html>
-{% include "footer.html" %}
+{% block content %}
+    <div>
+        {% if current_user.is_authenticated %}
+            <div class="d-flex mb-4">
+                <a
+                        class="btn btn-primary float-right"
+                        href="{{ url_for('project.add_project') }}"
+                >创建项目</a
+                >
+            </div>
+        {% endif %}
+    </div>
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+        {% for project in projects %}
+            <div>
+                <h3 class="d-flex mb-4">项目名称：{{ project.name }}
+                    <a class="btn btn-primary float-right"
+                       href="{{ url_for("project.edit_project",project_id=project.id) }}">编辑</a>
+                    <a class="btn btn-danger float-right"
+                       href="{{ url_for("project.del_project",project_id=project.id) }}">删除</a>
+                </h3>
+            </div>
+            <hr class="my-4"/>
+        {% endfor %}
+    </div>
+    <div>
+        {{ render_pagination(projects) }}
+    </div>
+{% endblock %}

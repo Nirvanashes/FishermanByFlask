@@ -4,7 +4,6 @@ from app.services.interface_services import InterfaceServices
 from app.services.testcase_services import TestCaseServices
 import asyncio
 
-
 case_route = Blueprint("case", __name__)
 
 
@@ -75,13 +74,20 @@ def execute_case():
 
 @case_route.route("/execute-case-result")
 def executed_result():
-    page = request.args.get("page",1,type=int)
+    page = request.args.get("page", 1, type=int)
     pagination = TestCaseServices.get_result_list_page(page=page)
     return render_template("execute-result.html", result_list=pagination)
 
 
 @case_route.route("/execute-case-result-info/<int:result_id>")
 def get_result_list(result_id):
-    page = request.args.get("page",1,type=int)
-    result_list = TestCaseServices.get_case_result_page(result_id,page=page)
+    page = request.args.get("page", 1, type=int)
+    result_list = TestCaseServices.get_case_result_page(result_id, page=page)
     return render_template("result-case-list.html", result_list=result_list)
+
+
+@case_route.route("/show-case-executed-result-info/<int:case_executed_result_id>")
+def show_case_executed_result_info(case_executed_result_id):
+    result = TestCaseServices.get_case_executed_result_by_id(case_executed_result_id)
+    print(result)
+    return render_template("result-case-info.html", result=result)

@@ -1,11 +1,16 @@
 {% extends "base.html" %}
 {% block title %}
-	首页
+    首页
 {% endblock %}
 {% block content %}
-    <h1>各项目接口数量统计</h1>
-    <div id="chart">
-        <!-- 图表将在这里渲染 -->
-        {{ chart_html|safe }}
+    <div>
+        <div id="chart"
+                {#             class="w-auto h-50"#}
+        >
+            <!-- 图表将在这里渲染 -->
+            {{ html_interface_by_product|safe }}
+            <!-- 图表将在这里渲染 -->
+            {{ html_testcase_by_interface|safe }}
+        </div>
     </div>
 {% endblock %}

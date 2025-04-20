@@ -1,7 +1,7 @@
 from typing import List
 from flask_login import UserMixin
 from sqlalchemy.orm import relationship, Mapped, mapped_column
-from sqlalchemy import Integer, String, Text, ForeignKey,JSON
+from sqlalchemy import Integer, String, Text, ForeignKey, JSON
 from app.extensions import db
 
 
@@ -77,7 +77,7 @@ class TestResultItem(UserInfo):
     interface_address: Mapped[str] = mapped_column(String)
     interface_method: Mapped[str] = mapped_column(String(10))
 
-    testcase_id:Mapped[int] = mapped_column(ForeignKey("test_case.id"))
+    testcase_id: Mapped[int] = mapped_column(ForeignKey("test_case.id"))
     testcase_name: Mapped[str] = mapped_column(String)
     headers: Mapped[dict] = mapped_column(JSON)
     params: Mapped[dict] = mapped_column(JSON)

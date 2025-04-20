@@ -10,7 +10,7 @@ interface_bp = Blueprint("interface", __name__)
 
 @interface_bp.route("/get-all-interface")
 def get_all_interface():
-    page = request.args.get("page",1,type=int)
+    page = request.args.get("page", 1, type=int)
     all_interface = InterfaceServices.get_all_interface_by_page(page)
     return render_template("interface.html", interface=all_interface)
 
@@ -23,10 +23,10 @@ def filter_by_project(project_id):
 
 @interface_bp.route("/interface-info/<int:interface_id>")
 def show_interface(interface_id):
-    page = request.args.get("page",1,type=int)
+    page = request.args.get("page", 1, type=int)
     interface_info = InterfaceServices.get_interface_by_id(interface_id)
-    case_info = TestCaseServices.get_case_by_interface_id_page(interface_id,page)
-    return render_template("interface-info.html", interface=interface_info,cases=case_info)
+    case_info = TestCaseServices.get_case_by_interface_id_page(interface_id, page)
+    return render_template("interface-info.html", interface=interface_info, cases=case_info)
 
 
 @interface_bp.route("/add-interface", methods=["GET", "POST"])

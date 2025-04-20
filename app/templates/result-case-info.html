@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/pagination.html' import render_pagination %}
+{% block content %}
+    <div>
+        <h1>测试结果</h1>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">用例名称</th>
+                <th scope="col">执行状态</th>
+                <th scope="col">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th scope="row">{{ result.testcase_name }}</th>
+                <td>{{ result.execution_status }}</td>
+                <td>
+                    <a class="btn btn-primary float-right"
+                       href="{{ url_for("case.edit_case",case_id=result.testcase_id) }}">编辑</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+

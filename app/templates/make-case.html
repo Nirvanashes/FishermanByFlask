@@ -1,16 +1,10 @@
-{% include "header.html" %}
+{% extends "base.html" %}
 {% from "bootstrap5/form.html" import render_form %}
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% block title %}
+	编写用例
+{% endblock %}
+{% block content %}
     <div>
-    {{ render_form(form) }}
+        {{ render_form(form) }}
     </div>
-</body>
-</html>
-{% include "footer.html" %}
+{% endblock %}
