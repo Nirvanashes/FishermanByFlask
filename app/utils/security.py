@@ -16,7 +16,7 @@ def generate_password(password: str) -> str:
     return generate_password_hash(
         password=password,
         method=Config.PASSWORD_HASH_METHOD,
-        salt_length=16
+        salt_length=Config.SALT_LENGTH
     )
 
 
@@ -25,6 +25,7 @@ def check_password(password_hash, password):
         pwhash=password_hash,
         password=password
     )
+
 
 # class UserInfo(UserMixin):
 #     def __init__(self, user):
@@ -50,3 +51,6 @@ def check_password(password_hash, password):
 #     if user:
 #         cache.set(cache_key, user, timeout=3600)
 # return user
+
+if __name__ == "__main__":
+    print(generate_password("123456"))
